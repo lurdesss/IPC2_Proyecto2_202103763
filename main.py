@@ -14,14 +14,12 @@ import xml.etree.ElementTree as ET
 from lista_doble import *
 from clases_nodo import *
 
-# graficas
-# import graphviz
-
 
 class Sistema():
     def __init__(self):
         self.principal()
         self.carga = None
+        self.valor_busqueda = None
 
 # ventana principal
     def principal(self):
@@ -74,26 +72,21 @@ class Sistema():
             return
         self.carga = Analizador(filepath)
         self.carga.cargar_dron()
-        # self.carga.mostrar_drones()
         self.carga.cargar_lista_sistemas_drones()
         self.carga.cargar_altura_cantidad()
         self.carga.cargar_sac()
         self.carga.cargar_lista_drones_sys()
-        # self.carga.lista_drones_procesar()
-        # self.carga.cargar_mms_inst()
         self.carga.cargar_mms_sys()
         self.carga.cargar_mms_inst()
         self.carga.cargar_mms_solo()
-        # self.carga.traendo_tamanos()
-        # self.carga.lista_drones_procesar()
         self.carga.mostrar_tamanos()
-        # self.carga.nueva_lista()
         self.carga.cargar_mms_solo_otro()
         self.carga.mostrar_tamanos_nuevos()
-        # self.carga.cargar_mms_solo_otro()
+        self.carga.tamanos_individuales_sumando()
+        self.carga.tamanos_reales_en()
+        self.carga.cargar_mms_all()
 
     def generar_archivo(self):  # INCISO C
-        # self.ventana.destroy()
         self.carga.generar_archivo_xml_mms()
 
     def gestionar_dron(self):  # INCISO D
@@ -159,13 +152,14 @@ class Sistema():
             print("Mostrando listado de drones...")
             self.scroll_ver_listado.delete(1.0, tk.END)
             drones_en = self.carga.lista_drones.primero
+            self.carga.lista_drones.ordenamiento()
             # long = self.carga.lista_drones.size
             long = self.carga.lista_drones.tamano()
             print(long)
             while drones_en:
                 for i in range(long):
                     self.scroll_ver_listado.insert(
-                        tk.END, f"dron {i+1}: {drones_en.dato.nombre}" + "\n")
+                        tk.END, f"  {drones_en.dato.nombre}" + "\n")
                     drones_en = drones_en.siguiente
                 break
         except Exception as e:  # mostrar mensaje
@@ -179,7 +173,6 @@ class Sistema():
                     valor_salida = Dron(valores_entrada)
                     agregando = self.carga.lista_drones.agregar_al_final(
                         valor_salida)
-                    # self.carga.lista_drones.ordenar_lista()
                 break
         except Exception as e:  # mostrar mensaje
             print("Error al ver listado de drones:", e)
@@ -227,24 +220,22 @@ class Sistema():
             mensajes_en = self.carga.lista_mms_solo.primero
             long_mms = self.carga.lista_mms_solo.size
             instrucciones_en = self.carga.lista_mms_inst.primero
-            tamanos_varios = self.carga.tamanos_individuales.primero
-            tamanos_sin_f = self.carga.tamanos_sin_final.primero
-            while mensajes_en and tamanos_sin_f:
+            tamanos_definitivos = self.carga.tamanos_reales.primero
+            while mensajes_en and tamanos_definitivos:
                 for i in range(long_mms):
                     self.scroll_ver_listado_mms.insert(
                         tk.END, f" {mensajes_en.dato.mms_dato}" + "\n")
                     while instrucciones_en:
-                        for i in range(tamanos_varios.dato.size_ind - tamanos_sin_f.dato.size_otro):
+                        for i in range(tamanos_definitivos.dato.size_nuevo):
                             self.scroll_ver_listado_mms.insert(
                                 tk.END, f"    {instrucciones_en.dato.dron_ins} , {instrucciones_en.dato.altura_ins}" + "\n")
                             instrucciones_en = instrucciones_en.siguiente
                         break
-                    tamanos_varios = tamanos_varios.siguiente
-                    tamanos_sin_f = tamanos_sin_f.siguiente
+                    tamanos_definitivos = tamanos_definitivos.siguiente
                     mensajes_en = mensajes_en.siguiente
                 break
         except Exception as e:  # mostrar mensaje
-            print("Error al ver listado de drones:", e)
+            print("Error:", e)
 
     def ver_instrucciones_mms_a(self):
         self.ventana_mms_a.destroy()
@@ -263,9 +254,12 @@ class Sistema():
         self.centrar(self.ventana_mms_b, 510, 450)
         # self.resizable(0, 0)
         # self.overrideredirect(True)
-        self.scroll_ver_listado = ScrollText(self.ventana_mms_b)
-        self.scroll_ver_listado.place(x=5, y=26)
-        self.ventana_mms_b.after(200, self.scroll_ver_listado.redraw())
+        self.scroll_ver_listado_ins = ScrollText(self.ventana_mms_b)
+        self.scroll_ver_listado_ins.place(x=5, y=26)
+        self.ventana_mms_b.after(200, self.scroll_ver_listado_ins.redraw())
+
+        # valores de busqueda
+        self.valor_busqueda = None
 
         # entry
         self.entry_buscar_mms = Entry(
@@ -300,17 +294,43 @@ class Sistema():
 
     # funciones
     def seleccionar_mms_b(self):
-        valor_busqueda = self.entry_buscar_mms.get()
-        while valor_busqueda:
-            if self.carga.lista_mms_solo.buscar_mms(valor_busqueda):
-                pass
-            break
+        try:
+            valor_en = self.entry_buscar_mms.get()
+            while valor_en:
+                if self.carga.lista_mms_solo.buscar_mms(valor_en):
+                    self.valor_busqueda = valor_en
+                    return
+                break
+        except Exception as e:  # mostrar mensaje
+            print("Error", e)
 
     def mostrar_sistema_drones_b(self):
-        print("Mostrando listado de mensajes ")
+        try:
+            self.scroll_ver_listado_ins.delete(1.0, tk.END)
+            mms_a_buscar = self.valor_busqueda
+            print(mms_a_buscar)
+            msg_sistema = self.carga.lista_mms_sys.primero
+            tamano_msg_sistema = self.carga.lista_mms_sys.size
+            lista_mms_todo = self.carga.lista_mms_all.primero
+            iterantes = self.carga.tamanos_reales.primero
+            while msg_sistema:
+                for i in range(tamano_msg_sistema):
+                    if msg_sistema.dato.nombre_mms == mms_a_buscar:
+                        # lista_mms_todo = lista_mms_todo.siguiente
+                        self.scroll_ver_listado_ins.insert(
+                            tk.END, f"  {msg_sistema.dato.mms_sys}" + "\n")
+                        # while lista_mms_todo:
+                        #     for i in range(iterantes.dato.size_nuevo):
+                        #         if self.carga.lista_mms_all.buscar_nombre_mms(mms_a_buscar):
+                        #             pass
+                        break
+                    msg_sistema = msg_sistema.siguiente
+                break
+        except Exception as e:  # mostrar mensaje
+            print("Error", e)
 
     def ver_graficamente_mms_b(self):
-        pass
+        self.seleccionar_mms_b()
 
     def __ir_pantalla_gestion_mms_a_desde_mms_b(self):
         self.ventana_mms_b.destroy()

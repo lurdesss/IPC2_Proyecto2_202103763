@@ -27,6 +27,22 @@ class ListaDoble:
             nodo_actual = nodo_actual.siguiente
         return None
 
+    def buscar_msg(self, nombre):
+        nodo_actual = self.primero
+        while nodo_actual:
+            if nodo_actual.dato.msg == nombre:
+                return nodo_actual.dato
+            nodo_actual = nodo_actual.siguiente
+        return None
+
+    def buscar_nombre_mms(self, nombre):
+        nodo_actual = self.primero
+        while nodo_actual:
+            if nodo_actual.dato.nombre_mms == nombre:
+                return nodo_actual.dato
+            nodo_actual = nodo_actual.siguiente
+        return None
+
     def agregar_inicio(self, dato):
         if self.vacia():
             self.primero = self.ultimo = Nodo(dato)
@@ -36,6 +52,17 @@ class ListaDoble:
             self.primero.anterior = None
             self.primero = aux
         self.size += 1
+
+    # tiempos optimos
+    def suma_para_tiempos_optimos(self):
+        nodo_dron = self.primero
+        tamano = self.size
+        suma = 0
+        while nodo_dron:
+            for i in range(tamano):
+                suma += nodo_dron.dato.tiempo
+                nodo_dron = nodo_dron.siguiente
+            return suma
 
     def buscar_mms(self, nombre):
         nodo_actual = self.primero
@@ -74,75 +101,22 @@ class ListaDoble:
             self.primero = self.primero.siguiente
             self.primero.anterior = None
             self.size -= 1
-    # def ordenar(self):
-    #     nodo_actual = self.primero
-    #     while nodo_actual:
-
-    # def ordenar_lista(self):
-    #     nodo_actual = self.primero
-    #     while nodo_actual:
-    #         i = 97
-    #         for caracter in nodo_actual.dato.nombre:
-    #             ascii = ord(caracter)
-    #             # for j in range(self.size):
-    #             while i in ascii and i < 122:
-    #                 return nodo_actual.dato
-    #             i += 1
-    #             nodo_actual = nodo_actual.siguiente
-
-    #             # else:
-    #             #     # self.primero = self.ultimo
-    #             #     aux = self.ultimo
-    #             #     self.ultimo = aux.siguiente
-    #             #     self.ultimo.anterior = aux
-    #         break
-
-    # # def ordenar_lista(self):
-    # #     nodo_actual = self.primero
-    # #     while nodo_actual:
-    # #         i = 65
-    # #         j = 97
-    # #         for caracter in nodo_actual.dato.nombre:
-    # #             ascii = ord(caracter)
-    # #             for j in range(self.size):
-    # #             if ascii == 68 in caracter:
-    # #                 return nodo_actual.dato
-    # #             print("es ordenado")
-    # #             i += 1
-    # #             nodo_actual = nodo_actual.siguiente
-    # #         else:
-    # #             print("no es valido")
-
-    # #             else:
-    # #                 # self.primero = self.ultimo
-    # #                 aux = self.ultimo
-    # #                 self.ultimo = aux.siguiente
-    # #                 self.ultimo.anterior = aux
-    # #         break
-
-    def ordenar_lista(self):
-        nodo_actual = self.primero
-        while nodo_actual:
-            if "Dron" in nodo_actual.dato.nombre:
-                return nodo_actual.dato
-            # print(nodo_actual.dato.nombre)
-            else:
-                aux = self.ultimo
-                self.ultimo = aux.siguiente
-                self.ultimo.anterior = aux
-            self.size += 1
-
-        else:
-            print("no es un nombre valido")
-
-    # def ordenar_lista(self):
-    #     nodo_actual = self.primero
-    #     while nodo_actual:
-    #         if "Dron" in nodo_actual.dato.nombre:
-    #             return nodo_actual.dato
-    #         nodo_actual = nodo_actual.siguiente
-    #     else:
-    #         print("no es un nombre valido")
 
     def tamano(self):
         return self.size
+
+    def ordenamiento(self):
+        if self.primero is None:
+            return
+        nodo_actual = self.primero
+        while nodo_actual:
+            menor = nodo_actual
+            siguiente_nodo = nodo_actual.siguiente
+            while siguiente_nodo:
+                if siguiente_nodo.dato.nombre < menor.dato.nombre:
+                    menor = siguiente_nodo
+                siguiente_nodo = siguiente_nodo.siguiente
+            if menor != nodo_actual:
+                # Intercambia posicion nodo_actual y menor
+                nodo_actual.dato.nombre, menor.dato.nombre = menor.dato.nombre, nodo_actual.dato.nombre
+            nodo_actual = nodo_actual.siguiente
