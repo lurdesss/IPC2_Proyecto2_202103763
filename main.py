@@ -362,7 +362,7 @@ Carnet: 202103763
             "#151718"), fg=("#f7ff19"), font=("Lucida Sans", 10, "underline"))
         self.lbl_link.place(x=115, y=130)
         self.lbl_link.bind("<Button-1>", lambda evento_link: webbrowser.open(
-            "https://github.com/lurdesss/IPC2_Proyecto2_202103763"))
+            "https://github.com/lurdesss/IPC2_Proyecto2_202103763/tree/main/DOCUMENTACION"))
 
         btn_regresarMenu = Button(self.ventana_ayuda, text="Volver a menu", command=self.__ir_pantalla_menu_desde_ayuda,
                                   width=13, height=1, font=("Lucida Sans", 10), bg="#f7ff19")
