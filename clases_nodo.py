@@ -83,3 +83,31 @@ class MmsSistemaInstruccionOtro:
         self.dron_ins = dron_ins
         self.altura_ins = altura_ins
         self.primer_dato = None
+
+
+class Suma:
+    def __init__(self, suma):
+        self.suma = suma
+        self.primer_dato = None
+
+
+# lista tiempos optimos
+class TiemposOptimos:
+    def __init__(self, tiempo):
+        self.tiempo = tiempo
+        self.primer_dato = None
+
+
+class MmsAll:
+    def __init__(self, msg, sistema, dron, altura):
+        self.msg = msg
+        self.sistema = sistema
+        self.dron = dron
+        self.altura = altura
+        self.primer_dato = None
+
+
+class MmsCifrados:
+    def __init__(self, mensaje):
+        self.mensaje = mensaje
+        self.primer_dato = None
